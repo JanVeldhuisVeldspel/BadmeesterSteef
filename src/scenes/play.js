@@ -1,6 +1,6 @@
 import global from './global';
 
-const updateLevels = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+const updateLevels = [3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60];
 
 class play extends global
 {
@@ -42,12 +42,10 @@ class play extends global
         this.beers = this.physics.add.group();
         this.enemies = this.physics.add.group();
 
-        // this.CreateBeer();
         this.CreateFish();
 
         this.CreateHud();
         this.CreateColliders();
-        // this.ListenToEvents();
         this.cursorKeys = this.input.keyboard.createCursorKeys();
         this.playerCanMove = true;
 
@@ -57,9 +55,68 @@ class play extends global
             this.music.play();
         }
 
-        window.addEventListener('deviceorientation', function(event) {
-            alert(event.alpha + ' : ' + event.beta + ' : ' + event.gamma);
-          });
+        this.isDesktop = this.sys.game.device.os.desktop;
+        if(!this.isDesktop)
+        {
+            // LEFT
+            this.leftButton = this.add.rectangle(0, 250, this.config.width/2.5,this.config.height-450).setFillStyle(0xffffff).setOrigin(0).setDepth(10).setAlpha(.001).setDepth(10).setInteractive();
+            this.leftButton.on("pointerdown",() =>{
+                this.leftButPressed = true;
+                this.rightButPressed = false;
+                this.upButPressed = false;
+                this.downButPressed = true;
+            })
+            this.leftButton.on("pointerup",() =>{
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+                this.upButPressed = false;
+                this.downButPressed = false;
+            })
+            // RIGHT
+            this.rightButton = this.add.rectangle(this.config.width-this.config.width/2.5, 250, this.config.width/2.5,this.config.height-200).setFillStyle(0xffffff).setOrigin(0).setDepth(10).setAlpha(.001).setDepth(10).setInteractive();
+            this.rightButton.on("pointerdown",() =>{
+                this.rightButPressed = true;
+                this.leftButPressed = false;
+                this.upButPressed = false;
+                this.downButPressed = true;
+            })
+            this.rightButton.on("pointerup",() =>{
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+                this.upButPressed = false;
+                this.downButPressed = false;                
+            })
+            // UP
+            this.upButton = this.add.rectangle(0, 0, this.config.width,250).setFillStyle(0xffffff).setOrigin(0).setDepth(10).setAlpha(.001).setDepth(10).setInteractive();
+            this.upButton.on("pointerdown",() =>{
+                this.upButPressed = true;
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+                this.downButPressed = false;
+            })
+            this.upButton.on("pointerup",() =>{
+                this.upButPressed = false;
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+                this.downButPressed = false;
+            })
+            // DOWN
+            this.downButton = this.add.rectangle(0, this.config.height-200, this.config.width,200).setFillStyle(0xffffff).setOrigin(0).setDepth(10).setAlpha(.001).setDepth(10).setInteractive();
+
+            this.downButton.on("pointerdown",() =>{
+                this.downButPressed = true;
+                this.upButPressed = false;
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+            })
+            this.downButton.on("pointerup",() =>{
+                this.leftButPressed = false;
+                this.rightButPressed = false;
+                this.upButPressed = false;
+                this.downButPressed = false;
+            })
+        }
+
     }
 
     // Update scene
@@ -400,9 +457,12 @@ class play extends global
         this.score ++;
         if(updateLevels.indexOf(this.score) != -1)
         {
-            this.spawndelay -= 10;
-            this.fishSpeedAddition +=.25;
-            this.stroming +=.05;
+            if(this.spawndelay > 0)
+            {
+                this.spawndelay -= 15;
+            }
+            this.fishSpeedAddition +=.05;
+            this.stroming +=.15;
         }
         this.scoreText.setText(`Score: ${this.score}`);
         if (this.score > this.highScore)
@@ -480,19 +540,30 @@ class play extends global
             this.playerCanMove = false;
             this.physics.pause();
             this.playerLife = 0;
+            this.upButPressed = false;
+            this.leftButPressed = false;
+            this.rightButPressed = false;
+            this.downButPressed = false;
+            if(this.canPlayAudio)
+            {
+                this.audioDie.play();
+            }
             this.UpdateHealthBar(this.playerLife);
-            this.PopUp("SUPER DOOD G");
-
-            // this.time.addEvent({
-            //     delay:1000,
-            //     callback: () => {
-            //     },
-            //     loop:false
-            // })
+            this.PopUp("GAME OVER");
+            this.time.addEvent({
+                delay:4000,
+                callback: () => {
+                    this.playerLife = 4;
+                    this.stroming = .25;
+                    this.spawndelay = 500;
+                    this.fishSpeedAddition = 10;
+                    this.score = 0;
+                    this.scoreText.setText(`Score: ${this.score}`);
+                    this.scene.start('play',{restart:false});
+                },
+                loop:false
+            })
         }
-        // this.IncreaseScore();
-        // this.SetHighScore();
-
     }
 
     PopUp(msg)
@@ -508,38 +579,6 @@ class play extends global
             loop:false
         })
     }
-
-    Die()
-    {
-        this.playerIsDead = true;
-        this.physics.pause();
-        this.upButPressed = false;
-        this.leftButPressed = false;
-        this.rightButPressed = false;
-        this.downButPressed = false;
-        if(this.canPlayAudio)
-        {
-            this.audioDie.play();
-        }
-        this.playerCanMove = false;
-        this.player.anims.play('player-die',true);
-        this.PopUp(popUpStrings[1]);
-        this.time.addEvent({
-            delay:2000,
-            callback: () => {
-                this.score = 0;
-                this.level = 1;
-                this.amountOfZombies = 1;
-                this.amountOfZombiesTemp = 1;
-                this.playerIsDead = false;
-                this.playerCanMove = true;
-                this.scene.start('play',{restart:false});
-
-            },
-            loop:false
-        })
-    }
-
 }
 
 export default play;
