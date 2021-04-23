@@ -30,10 +30,6 @@ class preloader extends Phaser.Scene
         //LOAD HEALTHBAR
         this.load.spritesheet("healthbar","assets/healthbar.png",{frameWidth:493,frameHeight:49});
 
-        //LOAD AUDIO BUTTON
-        // FONT
-        this.load.bitmapFont('font','assets/fonts/fontje.png', 'assets/fonts/fontje.fnt');
-
         //AUDIO
         this.load.audio('bgmusic', 'assets/audio/music.mp3');
         this.load.audio('die','assets/audio/die.mp3');

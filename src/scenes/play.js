@@ -56,6 +56,10 @@ class play extends global
             this.musicIsPlaying = true;
             this.music.play();
         }
+
+        window.addEventListener('deviceorientation', function(event) {
+            alert(event.alpha + ' : ' + event.beta + ' : ' + event.gamma);
+          });
     }
 
     // Update scene
@@ -238,6 +242,8 @@ class play extends global
         }
         this.fish = this.physics.add.sprite(Math.floor(Math.random()*(this.config.width-150)+15),this.config.height+100,'vis1');
         this.fish.anims.play('vis1-dobber');
+        this.fish.body.setSize(70, 90);
+        this.fish.setOffset(14,0);
         this.fish.setOrigin(0.5);
         this.fish.speed = speed;
         this.fish.setScale(fSize);
