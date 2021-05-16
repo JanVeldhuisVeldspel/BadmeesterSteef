@@ -1,6 +1,6 @@
 import global from './global';
 
-const updateLevels = [3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60];
+const updateLevels = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
 
 class play extends global
 {
@@ -178,7 +178,6 @@ class play extends global
         // PLAYER
         this.player.setFlipX(true);
         this.player.setAngle(-9.5);
-        // this.player.body.setVelocityY(0);
         if(this.player.x > 94)
         {
             this.player.body.setVelocityX(-this.playerSpeed);
@@ -190,7 +189,6 @@ class play extends global
         // PLAYER
         this.player.setFlipX(false);
         this.player.setAngle(9.5);
-        // this.player.body.setVelocityY(0);
         if(this.player.x < this.config.width-94)
         {
             this.player.body.setVelocityX(this.playerSpeed);
@@ -200,7 +198,6 @@ class play extends global
     UpButtonDown()
     {
         // PLAYER
-        // this.player.body.setVelocityX(0);
         this.player.setAngle(0);
         if(this.player.y > 250)
         {
@@ -274,9 +271,18 @@ class play extends global
         {
             this.CreateBeer();
         }
-        else
+        else if(chance > 1 && chance <4 )
         {
             this.CreateFish();
+
+        }
+        else if(chance > 3 && chance < 7 )
+        {
+            this.CreateFish2();
+        }
+        else
+        {
+            this.CreateFish3();
         }
     }
 
@@ -299,6 +305,40 @@ class play extends global
         }
         this.fish = this.physics.add.sprite(Math.floor(Math.random()*(this.config.width-150)+15),this.config.height+100,'vis1');
         this.fish.anims.play('vis1-dobber');
+        this.fish.body.setSize(70, 90);
+        this.fish.setOffset(14,0);
+        this.fish.setOrigin(0.5);
+        this.fish.speed = speed;
+        this.fish.setScale(fSize);
+        this.enemies.add(this.fish);
+    }
+    CreateFish2()
+    {
+        let fSize = Math.random()+1;
+        let speed = Math.floor(Math.random()*5)+this.fishSpeedAddition;
+        if(fSize > 1.5)
+        {
+            fSize = 1.5;
+        }
+        this.fish = this.physics.add.sprite(Math.floor(Math.random()*(this.config.width-150)+15),this.config.height+100,'vis2');
+        this.fish.anims.play('vis2-dobber');
+        this.fish.body.setSize(70, 90);
+        this.fish.setOffset(14,0);
+        this.fish.setOrigin(0.5);
+        this.fish.speed = speed;
+        this.fish.setScale(fSize);
+        this.enemies.add(this.fish);
+    }
+    CreateFish3()
+    {
+        let fSize = Math.random()+1;
+        let speed = Math.floor(Math.random()*5)+this.fishSpeedAddition;
+        if(fSize > 1.5)
+        {
+            fSize = 1.5;
+        }
+        this.fish = this.physics.add.sprite(Math.floor(Math.random()*(this.config.width-150)+15),this.config.height+100,'vis3');
+        this.fish.anims.play('vis3-dobber');
         this.fish.body.setSize(70, 90);
         this.fish.setOffset(14,0);
         this.fish.setOrigin(0.5);
@@ -428,19 +468,18 @@ class play extends global
         })
         this.enemies.getChildren().forEach(e => {
             e.y += -this.stroming*e.speed;
-            if(e.y < -105)
+            if(e.y < -50)
             {
                 this.IncreaseScore();
                 this.SetHighScore();
                 e.destroy();
+                this.timer = this.spawndelay-10;
             }
         })
     }
 
     CreateColliders()
     {
-        // this.physics.add.collider(this.player,this.can, this.GetCan, null, this);
-        // this.physics.add.collider(this.player,this.beers, this.GetBeer, null, this);
         this.physics.add.overlap(this.player, this.beers, this.GetBeer, null, this);
         this.physics.add.overlap(this.player, this.enemies, this.GetHurt, null, this);
     }
@@ -457,12 +496,18 @@ class play extends global
         this.score ++;
         if(updateLevels.indexOf(this.score) != -1)
         {
+            this.PopUp("LEVEL UP");
+            if(this.canPlayAudio)
+            {
+                this.audioLevelUp.play();
+            }
             if(this.spawndelay > 0)
             {
                 this.spawndelay -= 15;
             }
-            this.fishSpeedAddition +=.05;
-            this.stroming +=.15;
+            this.fishSpeedAddition +=.025;
+            this.stroming +=.05;
+
         }
         this.scoreText.setText(`Score: ${this.score}`);
         if (this.score > this.highScore)
@@ -489,10 +534,10 @@ class play extends global
     {
         // this.physics.pause();
         this.player.setTint(0xf2b100);
-        // if(this.canPlayAudio)
-        // {
-        //     this.audioWin.play();
-        // }
+        if(this.canPlayAudio)
+        {
+            this.audioScore.play();
+        }
         beer.destroy();
         if(this.playerLife < 4)
         {
@@ -512,19 +557,20 @@ class play extends global
             },
             loop:false
         })
+        this.timer = this.spawndelay-50;
     }
 
     GetHurt(player,enemie)
     {
         // this.physics.pause();
         this.player.setTint(0xff0000);
-        // if(this.canPlayAudio)
-        // {
-        //     this.audioWin.play();
-        // }
         enemie.destroy();
         if(this.playerLife > 1)
         {
+            if(this.canPlayAudio)
+            {
+                this.audioAu.play();
+            }
             this.playerLife --;
             this.UpdateHealthBar(this.playerLife);
             this.time.addEvent({
@@ -534,6 +580,7 @@ class play extends global
                 },
                 loop:false
             })
+            this.timer = this.spawndelay-50;
         }
         else
         {
@@ -546,8 +593,11 @@ class play extends global
             this.downButPressed = false;
             if(this.canPlayAudio)
             {
+                this.musicIsPlaying = false;
+                this.music.stop();
                 this.audioDie.play();
             }
+
             this.UpdateHealthBar(this.playerLife);
             this.PopUp("GAME OVER");
             this.time.addEvent({

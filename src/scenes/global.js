@@ -25,8 +25,11 @@ class global extends Phaser.Scene
         }
         //CREATE BACKGROUND MUSIC
         this.music = this.sound.add('bgmusic');
+        this.audioAu = this.sound.add('au');
         this.audioDie = this.sound.add('die');
         this.audioWin = this.sound.add('win');
+        this.audioScore = this.sound.add('score');
+        this.audioLevelUp = this.sound.add('win');
         this.music.loop = true;
     }
 

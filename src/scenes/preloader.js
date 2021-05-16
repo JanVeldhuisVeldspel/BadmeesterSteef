@@ -26,14 +26,18 @@ class preloader extends Phaser.Scene
 
         //LOAD FISH
         this.load.spritesheet("vis1","assets/vis.png",{frameWidth:99,frameHeight:100});
+        this.load.spritesheet("vis2","assets/vis2.png",{frameWidth:99,frameHeight:100});
+        this.load.spritesheet("vis3","assets/vis3.png",{frameWidth:99,frameHeight:100});
 
         //LOAD HEALTHBAR
         this.load.spritesheet("healthbar","assets/healthbar.png",{frameWidth:493,frameHeight:49});
 
         //AUDIO
         this.load.audio('bgmusic', 'assets/audio/music.mp3');
-        this.load.audio('die','assets/audio/die.mp3');
+        this.load.audio('au','assets/audio/au.mp3');
+        this.load.audio('die','assets/audio/dood.mp3');
         this.load.audio('win','assets/audio/win.mp3');
+        this.load.audio('score','assets/audio/score.mp3');
     }
 
     create()
@@ -74,8 +78,20 @@ class preloader extends Phaser.Scene
             frameRate:9,
             repeat:-1
         });
+        this.anims.create({
+            key:'vis2-dobber',
+            frames: this.anims.generateFrameNumbers("vis2",{frames:[0,1,2,3]}),
+            frameRate:9,
+            repeat:-1
+        });
+        this.anims.create({
+            key:'vis3-dobber',
+            frames: this.anims.generateFrameNumbers("vis3",{frames:[0,1,2,3]}),
+            frameRate:9,
+            repeat:-1
+        });
 
-        this.scene.start("menu");
+        this.scene.start("splash");
     }
 }
 export default preloader;
